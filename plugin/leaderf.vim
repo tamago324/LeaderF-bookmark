@@ -15,3 +15,5 @@ endif
 let g:Lf_BookmarkAcceptSelectionCmd = get(g:, 'Lf_BookmarkAcceptSelectionCmd', 'edit')
 
 command! -nargs=+ -complete=file BookmarkAdd call leaderf#Bookmark#add(<f-args>)
+command! -nargs=1 -complete=custom,leaderf#bookmark#delete_complete
+\           BookmarkDelete call leaderf#Bookmark#delete(<f-args>)

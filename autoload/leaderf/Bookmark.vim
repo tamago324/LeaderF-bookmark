@@ -181,3 +181,7 @@ function! s:load_bookmaks() abort
 
     return json_decode(l:lines[0])
 endfunction
+
+function! leaderf#bookmark#delete_complete(arglead, cmdline, cursorpos) abort
+    return join(keys(s:load_bookmaks()), "\n")
+endfunction
