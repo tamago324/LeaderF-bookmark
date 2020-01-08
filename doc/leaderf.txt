@@ -14,6 +14,7 @@ REQUIREMENTS~
 OPTIONS~
 
 g:Lf_BookmarkFilePath                           *g:Lf_BookmarkFilePath*
+    Specify the path of the file to save the bookmark.
     default: '~/.LfBookmark'
 
 g:Lf_BookmarkAcceptSelectionCmd                 *g:Lf_BookmarkOpenCommand*
@@ -23,10 +24,27 @@ g:Lf_BookmarkAcceptSelectionCmd                 *g:Lf_BookmarkOpenCommand*
 ==============================================================================
 USAGE~
 
-:LeaderfBookmark                                *LeaderfBookmark*
+------------------------------------------------------------------------------
+COMMANDS~
+
+:LeaderfBookmark                                *:LeaderfBookmark*
     Launch LeaderF to navigate the bookmark.
 
-:BookmarkAdd                                    *BookmarkAdd*
+:BookmarkAdd {path} [{name}]                    *:BookmarkAdd*
+    Add directory {path} with {name}.
+    If {name} is not specified, the directory name will be the bookmark name.
+
+
+------------------------------------------------------------------------------
+FUNCTIONS~
+
+leaderf#bookmark#add({path}, [{name}])          *leaderf#bookmark#add()*
+    Add directory {path} with {name}.
+    If {name} is not specified, the directory name will be the bookmark name.
+    Function version of |:BookmarkAdd|.
+
+leaderf#bookmark#delete({path})                 *leaderf#bookmark#delete()*
+    Delete bookmark at {path}.
 
 
 ==============================================================================
