@@ -25,11 +25,16 @@ class BookmarkExplorer(Explorer):
             bookmarks = json.load(f)
 
         # from mruExpl.py
-        _max_name_len = max(int(lfEval("strdisplaywidth('%s')" % escQuote(getBasename(line)))) for line in bookmarks.values())
+        _max_name_len = max(
+            int(lfEval("strdisplaywidth('%s')" % escQuote(getBasename(line))))
+            for line in bookmarks.values()
+        )
         lines = []
         for path, name in bookmarks.items():
-            space_num = _max_name_len - int(lfEval("strdisplaywidth('%s')" % escQuote(name)))
-            lines.append('{}{} "{}"'.format(name, ' ' * space_num, path))
+            space_num = _max_name_len - int(
+                lfEval("strdisplaywidth('%s')" % escQuote(name))
+            )
+            lines.append('{}{} "{}"'.format(name, " " * space_num, path))
         return lines
 
     def getStlCategory(self):
@@ -62,7 +67,7 @@ class BookmarkExplManager(Manager):
 
     def _getDigest(self, line, mode):
         if not line:
-            return ''
+            return ""
         return line
 
     def _getDigestStartPos(self, line, mode):
@@ -86,5 +91,4 @@ class BookmarkExplManager(Manager):
 #*****************************************************
 bookmarkExplManager = BookmarkExplManager()
 
-__all__ = ['bookmarkExplManager']
-
+__all__ = ["bookmarkExplManager"]
