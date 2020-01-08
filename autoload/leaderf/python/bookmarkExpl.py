@@ -60,10 +60,7 @@ class BookmarkExplManager(Manager):
         path = line[pos+2:-1]
 
         # from mruExpl.py
-        if kwargs.get('mode', '') == 't':
-            lfCmd('tab drop %s' % escSpecial(path))
-        else:
-            lfCmd("edit %s" % escSpecial(path))
+        lfCmd("Vaffle %s" % path)
 
     def _getDigest(self, line, mode):
         if not line:
