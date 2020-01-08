@@ -7,6 +7,10 @@ This Plugin use LeaderF to navigate the bookmark.
 ```
 :LeaderfBookmark
 ```
+or
+```
+:Leaderf bookmark
+```
 
 Add bookmark
 
