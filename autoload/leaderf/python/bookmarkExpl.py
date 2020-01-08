@@ -17,10 +17,6 @@ class BookmarkExplorer(Explorer):
         pass
 
     def getContent(self, *args, **kwargs):
-        # To refresh after deleting
-        return self.getFreshContent(args, kwargs)
-
-    def getFreshContent(self, *args, **kwargs):
         bookmark_filepath = lfEval("g:Lf_BookmarkFilePath")
         if not os.path.exists(bookmark_filepath):
             return []
@@ -43,7 +39,6 @@ class BookmarkExplorer(Explorer):
             )
             lines.append('{}{} "{}"'.format(name, " " * space_num, path))
         return lines
-
 
     def getStlCategory(self):
         return "Bookmark"
@@ -77,8 +72,13 @@ class BookmarkExplManager(Manager):
         instance = self._getInstance()
         line = instance.currentLine
         path = self._getDirPath(line)
-        lfCmd('call leaderf#Bookmark#delete("{}")'.format(path))
-        self.refresh()
+        instance.exitBuffer()
+        try:
+            lfCmd('call leaderf#Bookmark#delete("{}")'.format(path))
+        except KeyboardInterrupt:
+            pass
+        except vim.error as e:
+            lfPrintError(e)
 
     def _getDigest(self, line, mode):
         if not line:
