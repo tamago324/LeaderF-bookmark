@@ -17,6 +17,10 @@ class BookmarkExplorer(Explorer):
         pass
 
     def getContent(self, *args, **kwargs):
+        # To refresh after deleting
+        return self.getFreshContent(args, kwargs)
+
+    def getFreshContent(self, *args, **kwargs):
         bookmark_filepath = lfEval("g:Lf_BookmarkFilePath")
         if not os.path.exists(bookmark_filepath):
             return []
@@ -24,18 +28,22 @@ class BookmarkExplorer(Explorer):
         with lfOpen(bookmark_filepath) as f:
             bookmarks = json.load(f)
 
+        if len(bookmarks) == 0:
+            return []
+
         # from mruExpl.py
         _max_name_len = max(
-            int(lfEval("strdisplaywidth('%s')" % escQuote(getBasename(line))))
+            int(lfEval("strdisplaywidth('{}')".format(escQuote(getBasename(line)))))
             for line in bookmarks.values()
         )
         lines = []
         for path, name in bookmarks.items():
             space_num = _max_name_len - int(
-                lfEval("strdisplaywidth('%s')" % escQuote(name))
+                lfEval("strdisplaywidth('{}')".format(escQuote(name)))
             )
             lines.append('{}{} "{}"'.format(name, " " * space_num, path))
         return lines
+
 
     def getStlCategory(self):
         return "Bookmark"
@@ -64,6 +72,13 @@ class BookmarkExplManager(Manager):
         cmd = lfEval("g:Lf_BookmarkAcceptSelectionCmd")
         path = self._getDirPath(line)
         lfCmd("{} {}".format(cmd, path))
+
+    def delete(self, *args, **kwargs):
+        instance = self._getInstance()
+        line = instance.currentLine
+        path = self._getDirPath(line)
+        lfCmd('call leaderf#Bookmark#delete("{}")'.format(path))
+        self.refresh()
 
     def _getDigest(self, line, mode):
         if not line:

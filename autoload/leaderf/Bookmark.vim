@@ -24,6 +24,7 @@ function! leaderf#Bookmark#Maps()
     nnoremap <buffer> <silent> q             :exec g:Lf_py "bookmarkExplManager.quit()"<CR>
     nnoremap <buffer> <silent> <Tab>         :exec g:Lf_py "bookmarkExplManager.input()"<CR>
     nnoremap <buffer> <silent> <F1>          :exec g:Lf_py "bookmarkExplManager.toggleHelp()"<CR>
+    nnoremap <buffer> <silent> d             :exec g:Lf_py "bookmarkExplManager.delete()"<CR>
     if has_key(g:Lf_NormalMap, "Bookmark")
         for i in g:Lf_NormalMap["Bookmark"]
             exec 'nnoremap <buffer> <silent> '.i[0].' '.i[1]
@@ -61,6 +62,33 @@ function! leaderf#Bookmark#add(path, ...) abort
     let l:encoded = json_encode(l:bookmarks)
     call writefile([l:encoded], g:Lf_BookmarkFilePath)
     execute printf('echo "Success added bookmark. (%s => %s)"', l:name, l:path)
+endfunction
+
+function! leaderf#Bookmark#delete(path) abort
+    let l:path = a:path
+    if has('win32')
+        let l:path = substitute(expand(l:path), '\\', '/', 'g')
+    endif
+
+    let l:bookmarks = s:load_bookmaks()
+    if !has_key(l:bookmarks, l:path)
+        echohl ErrorMsg
+        execute printf('echo "Bookmark with path \"%s\" does not exist."', l:path)
+        echohl None
+        return
+    endif
+
+    let yn = input(printf('Delete ''%s'' (y/N)? ', l:bookmarks[l:path]))
+    echo "\n"
+    if empty(yn) || yn ==? 'n'
+        echo 'Cancelled.'
+        return
+    endif
+
+    let l:deleted = remove(l:bookmarks, l:path)
+    let l:encoded = json_encode(l:bookmarks)
+    call writefile([l:encoded], g:Lf_BookmarkFilePath)
+    execute printf('echo "Success deleted bookmark. (%s)"', l:path)
 endfunction
 
 " {path: name, path: name}
