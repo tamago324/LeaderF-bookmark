@@ -24,7 +24,13 @@ class BookmarkExplorer(Explorer):
         with lfOpen(bookmark_filepath) as f:
             bookmarks = json.load(f)
 
-        return ['{} {}'.format(v, k) for k, v in bookmarks.items()]
+        # from mruExpl.py
+        _max_name_len = max(int(lfEval("strdisplaywidth('%s')" % escQuote(getBasename(line)))) for line in bookmarks.values())
+        lines = []
+        for path, name in bookmarks.items():
+            space_num = _max_name_len - int(lfEval("strdisplaywidth('%s')" % escQuote(name)))
+            lines.append('{}{} "{}"'.format(name, ' ' * space_num, path))
+        return lines
 
     def getStlCategory(self):
         return "Bookmark"
@@ -50,10 +56,14 @@ class BookmarkExplManager(Manager):
         if len(args) == 0:
             return
         line = args[0]
-        cmd = line.split(None, 1)[0]
-        lfCmd("norm! `" + cmd)
-        lfCmd("norm! zz")
-        lfCmd("setlocal cursorline! | redraw | sleep 100m | setlocal cursorline!")
+        pos = line.find(' "')
+        path = line[pos+2:-1]
+
+        # from mruExpl.py
+        if kwargs.get('mode', '') == 't':
+            lfCmd('tab drop %s' % escSpecial(path))
+        else:
+            lfCmd("edit %s" % escSpecial(path))
 
     def _getDigest(self, line, mode):
         if not line:
