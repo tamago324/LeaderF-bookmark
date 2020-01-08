@@ -17,7 +17,7 @@ class BookmarkExplorer(Explorer):
         pass
 
     def getContent(self, *args, **kwargs):
-        bookmark_filepath = lfEval('g:Lf_BookmarkFilePath')
+        bookmark_filepath = lfEval("g:Lf_BookmarkFilePath")
         if not os.path.exists(bookmark_filepath):
             return []
 
@@ -56,11 +56,9 @@ class BookmarkExplManager(Manager):
         if len(args) == 0:
             return
         line = args[0]
-        pos = line.find(' "')
-        path = line[pos+2:-1]
-
-        # from mruExpl.py
-        lfCmd("Vaffle %s" % path)
+        cmd = lfEval("g:Lf_BookmarkAcceptSelectionCmd")
+        path = self._getDirPath(line)
+        lfCmd("{} {}".format(cmd, path))
 
     def _getDigest(self, line, mode):
         if not line:
@@ -79,6 +77,9 @@ class BookmarkExplManager(Manager):
         help.append('" ---------------------------------------------------------')
         return help
 
+    def _getDirPath(self, line):
+        pos = line.find(' "')
+        return line[pos + 2:-1]
 
 #*****************************************************
 # bookmarkExplManager is a singleton

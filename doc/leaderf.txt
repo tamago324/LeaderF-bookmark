@@ -16,6 +16,9 @@ OPTIONS~
 g:Lf_BookmarkFilePath                           *g:Lf_BookmarkFilePath*
     default: '~/.LfBookmark'
 
+g:Lf_BookmarkAcceptSelectionCmd                 *g:Lf_BookmarkOpenCommand*
+    Command to execute when accepting selection.
+    default: 'edit'
 
 ==============================================================================
 USAGE~

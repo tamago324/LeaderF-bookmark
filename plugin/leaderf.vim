@@ -9,7 +9,9 @@
 
 let g:Lf_BookmarkFilePath = expand(get(g:, 'Lf_BookmarkFilePath', '~/.LfBookmarks'))
 if has('win32')
-    let g:Lf_BookmarkFilePath = substitute(g:Lf_BookmarkFilePath, '\', '/', 'g')
+    let g:Lf_BookmarkFilePath = substitute(g:Lf_BookmarkFilePath, '\\', '/', 'g')
 endif
 
-command! -nargs=+ BookmarkAdd call leaderf#Bookmark#add(<f-args>)
+let g:Lf_BookmarkAcceptSelectionCmd = get(g:, 'Lf_BookmarkAcceptSelectionCmd', 'edit')
+
+command! -nargs=+ -complete=file BookmarkAdd call leaderf#Bookmark#add(<f-args>)
