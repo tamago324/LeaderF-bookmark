@@ -46,6 +46,9 @@ class BookmarkExplorer(Explorer):
     def getStlCurDir(self):
         return escQuote(lfEncode(os.getcwd()))
 
+    def supportsNameOnly(self):
+        return True
+
 
 #*****************************************************
 # BookmarkExplManager
@@ -65,7 +68,7 @@ class BookmarkExplManager(Manager):
             return
         line = args[0]
         cmd = lfEval("g:Lf_BookmarkAcceptSelectionCmd")
-        path = self._getDirPath(line)
+        path = self._getDigest(line, 2)
         lfCmd("{} {}".format(cmd, path))
 
     def delete(self, *args, **kwargs):
@@ -83,10 +86,25 @@ class BookmarkExplManager(Manager):
     def _getDigest(self, line, mode):
         if not line:
             return ""
-        return line
+        if mode == 0:
+            return line
+        elif mode == 1:
+            start_pos = line.find(' "')
+            return line[:start_pos].rstrip()
+        else:
+            start_pos = line.find(' "')
+            return line[start_pos+2:-1]
 
     def _getDigestStartPos(self, line, mode):
-        return 0
+        if not line:
+            return 0
+
+        # TODO: --no-split-path に対応する
+        if mode == 2:
+            start_pos = line.find(' "')
+            return lfBytesLen(line[:start_pos+2])
+        else:
+            return 0
 
     def _createHelp(self):
         help = []
@@ -97,10 +115,6 @@ class BookmarkExplManager(Manager):
         help.append('" <F1> : toggle this help')
         help.append('" ---------------------------------------------------------')
         return help
-
-    def _getDirPath(self, line):
-        pos = line.find(' "')
-        return line[pos + 2:-1]
 
 #*****************************************************
 # bookmarkExplManager is a singleton
