@@ -106,6 +106,19 @@ class BookmarkExplManager(Manager):
         else:
             return 0
 
+    def _afterEnter(self):
+        super(BookmarkExplManager, self)._afterEnter()
+        if self._getInstance().getWinPos() == "popup":
+            lfCmd(
+                """call win_execute(%d, 'let matchid = matchadd(''Lf_hl_bookmarkPath'', ''\s\+\zs".\+'')')"""
+                % self._getInstance().getPopupWinId()
+            )
+            id = int(lfEval("matchid"))
+            self._match_ids.append(id)
+        else:
+            id = int(lfEval("matchadd('Lf_hl_bookmarkPath', '\s+\zs"".+')"))
+            self._match_ids.append(id)
+
     def _createHelp(self):
         help = []
         help.append('" <CR>/<double-click>/o : execute command under cursor')
@@ -115,6 +128,7 @@ class BookmarkExplManager(Manager):
         help.append('" <F1> : toggle this help')
         help.append('" ---------------------------------------------------------')
         return help
+
 
 #*****************************************************
 # bookmarkExplManager is a singleton
