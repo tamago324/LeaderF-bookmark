@@ -46,6 +46,12 @@ leaderf#bookmark#add({path}, [{name}])          *leaderf#bookmark#add()*
 leaderf#bookmark#delete({path})                 *leaderf#bookmark#delete()*
     Function version of |:BookmarkDelete|.
 
+------------------------------------------------------------------------------
+HIGHLIGHTS~
+
+Lf_hl_bookmarkPath                              *Lf_hl_bookmarkPath*
+    default: `highlight def link Lf_hl_bookmarkPath Comment`
+
 
 ==============================================================================
 vim:tw=78:ts=4:ft=help:norl
