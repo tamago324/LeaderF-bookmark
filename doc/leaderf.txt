@@ -13,11 +13,11 @@ REQUIREMENTS~
 ==============================================================================
 OPTIONS~
 
-g:Lf_BookmarkFilePath                           *g:Lf_BookmarkFilePath*
+g:Lf_BookmarkFilePath                                   *g:Lf_BookmarkFilePath*
     Specify the path of the file to save the bookmark.
     default: '~/.LfBookmark'
 
-g:Lf_BookmarkAcceptSelectionCmd                 *g:Lf_BookmarkOpenCommand*
+g:Lf_BookmarkAcceptSelectionCmd                      *g:Lf_BookmarkOpenCommand*
     Command to execute when accepting selection.
     default: 'edit'
 
@@ -25,33 +25,51 @@ g:Lf_BookmarkAcceptSelectionCmd                 *g:Lf_BookmarkOpenCommand*
 USAGE~
 
 ------------------------------------------------------------------------------
-COMMANDS~
+COMMANDS~                                           *LeaderF-bookmark-commands*
 
-:LeaderfBookmark                                *:LeaderfBookmark*
+:LeaderfBookmark                                             *:LeaderfBookmark*
     Launch LeaderF to navigate the bookmark.
 
-:BookmarkAdd {path} [{name}]                    *:BookmarkAdd*
+:BookmarkAdd {name} {path}                                       *:BookmarkAdd*
     Add directory {path} with {name}.
+
+:BookmarkAddHere [{name}]                                    *:BookmarkAddHere*
+    Add cwd with {name}.
     If {name} is not specified, the directory name will be the bookmark name.
 
-:BookmarkDelete {path}                          *:BookmarkDelete*
-    Delete bookmark at {path}.
+:BookmarkEdit {name}                                            *:BookmarkEdit*
+    Edit bookmark at {name}.
+
+:BookmarkDelete {name}                                        *:BookmarkDelete*
+    Delete bookmark at {name}.
 
 ------------------------------------------------------------------------------
 FUNCTIONS~
 
-leaderf#bookmark#add({path}, [{name}])          *leaderf#bookmark#add()*
+leaderf#bookmark#add({name}, {path})                   *leaderf#bookmark#add()*
     Function version of |:BookmarkAdd|.
 
-leaderf#bookmark#delete({path})                 *leaderf#bookmark#delete()*
+leaderf#bookmark#add_here([{name}])               *leaderf#bookmark#add_here()*
+    Function version of |:BookmarkAddHere|.
+
+leaderf#bookmark#edit({name})                         *leaderf#bookmark#edit()*
+    Function version of |:BookmarkEdit|.
+
+leaderf#bookmark#delete({name})                     *leaderf#bookmark#delete()*
     Function version of |:BookmarkDelete|.
 
 ------------------------------------------------------------------------------
 HIGHLIGHTS~
 
-Lf_hl_bookmarkPath                              *Lf_hl_bookmarkPath*
+Lf_hl_bookmarkPath                                         *Lf_hl_bookmarkPath*
     default: `highlight def link Lf_hl_bookmarkPath Comment`
 
+
+==============================================================================
+CHANGELOG                                          *LeaderF-bookmark-changelog*
+
+0.0.1   2020-04-09
+    - Initial version.
 
 ==============================================================================
 vim:tw=78:ts=4:ft=help:norl

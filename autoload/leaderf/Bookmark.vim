@@ -25,6 +25,7 @@ function! leaderf#Bookmark#Maps()
     nnoremap <buffer> <silent> <Tab>         :exec g:Lf_py "bookmarkExplManager.input()"<CR>
     nnoremap <buffer> <silent> <F1>          :exec g:Lf_py "bookmarkExplManager.toggleHelp()"<CR>
     nnoremap <buffer> <silent> d             :exec g:Lf_py "bookmarkExplManager.delete()"<CR>
+    nnoremap <buffer> <silent> e             :exec g:Lf_py "bookmarkExplManager.edit()"<CR>
     if has_key(g:Lf_NormalMap, "Bookmark")
         for i in g:Lf_NormalMap["Bookmark"]
             exec 'nnoremap <buffer> <silent> '.i[0].' '.i[1]
@@ -115,73 +116,178 @@ function! leaderf#Bookmark#NormalModeFilter(winid, key) abort
         exec g:Lf_py "bookmarkExplManager.toggleHelp()"
     elseif key ==? "d"
         exec g:Lf_py "bookmarkExplManager.delete()"
+    elseif key ==? "e"
+        exec g:Lf_py "bookmarkExplManager.edit()"
     endif
 
     return 1
 endfunction
 
 
-function! leaderf#Bookmark#add(path, ...) abort
-    let l:path = a:path
-    if has('win32')
-        let l:path = substitute(expand(l:path), '\\', '/', 'g')
-    endif
 
-    let l:name = a:0 == 0 ? fnamemodify(l:path, ':t') : a:1
+" =====================
+" add
+" =====================
+function! leaderf#Bookmark#add(name, path) abort
+    let l:path = has('win32') ? substitute(expand(a:path), '\\', '/', 'g') : a:path
 
     " Add when not exists.
     let l:bookmarks = s:load_bookmaks()
-    if has_key(l:bookmarks, l:path)
-        echohl ErrorMsg
-        execute printf('echo "Already exists in bookmark. (%s)"', l:path)
-        echohl None
+    if has_key(l:bookmarks, a:name)
+        call s:echoerr(printf('echo "Already exists in bookmark. (%s)"', a:name))
         return
     endif
 
-    let l:bookmarks[l:path] = l:name
-    let l:encoded = json_encode(l:bookmarks)
-    call writefile([l:encoded], g:Lf_BookmarkFilePath)
-    execute printf('echo "Success added bookmark. (%s => %s)"', l:name, l:path)
+    call s:add(a:name, l:path)
+    execute printf('echo "Success added bookmark. (%s => %s)"', a:name, l:path)
 endfunction
 
-function! leaderf#Bookmark#delete(path) abort
-    let l:path = a:path
-    if has('win32')
-        let l:path = substitute(expand(l:path), '\\', '/', 'g')
-    endif
 
-    let l:bookmarks = s:load_bookmaks()
-    if !has_key(l:bookmarks, l:path)
-        echohl ErrorMsg
-        execute printf('echo "Bookmark with path \"%s\" does not exist."', l:path)
-        echohl None
-        return
-    endif
+" ---------------------
+" add here
+" ---------------------
+function! leaderf#Bookmark#add_here(...) abort
+    let l:path = has('win32') ? substitute(expand(getcwd()), '\\', '/', 'g') : getcwd()
+    let l:name = get(a:, 1, fnamemodify(l:path, ':t'))
 
-    let yn = input(printf('Delete ''%s'' (y/N)? ', l:bookmarks[l:path]))
+    let yn = input(printf('Add ''%s'' (y/N)? ', l:name))
     echo "\n"
     if empty(yn) || yn ==? 'n'
         echo 'Cancelled.'
         return
     endif
 
-    let l:deleted = remove(l:bookmarks, l:path)
-    let l:encoded = json_encode(l:bookmarks)
-    call writefile([l:encoded], g:Lf_BookmarkFilePath)
-    execute printf('echo "Success deleted bookmark. (%s)"', l:path)
+    call leaderf#Bookmark#add(l:name, l:path)
 endfunction
 
-" {path: name, path: name}
-function! s:load_bookmaks() abort
-    if !filereadable(g:Lf_BookmarkFilePath)
-        return {}
+
+
+function! s:add(name, path) abort
+    let l:path = has('win32') ? substitute(expand(a:path), '\\', '/', 'g') : a:path
+    let l:bookmarks = s:load_bookmaks()
+    let l:bookmarks[a:name] = l:path
+    call s:write(l:bookmarks)
+endfunction
+
+
+
+
+" =====================
+" delete
+" =====================
+function! leaderf#Bookmark#delete(name) abort
+    if !has_key(s:load_bookmaks(), a:name)
+        call s:echoerr(printf('echo "Not exists in bookmark. (%s)"', a:name))
+        return
     endif
+
+    let yn = input(printf('Delete ''%s'' (y/N)? ', a:name))
+    echo "\n"
+    if empty(yn) || yn ==? 'n'
+        echo 'Cancelled.'
+        return
+    endif
+
+    call s:delete(a:name)
+    redraw!
+    echo  printf('Success deleted bookmark. (%s)', a:name)
+endfunction
+
+
+function! s:delete(name) abort
+    let l:bookmarks = s:load_bookmaks()
+    let l:deleted = remove(l:bookmarks, a:name)
+    call s:write(l:bookmarks)
+endfunction
+
+
+
+" =====================
+" edit
+" =====================
+function! leaderf#Bookmark#edit(name) abort
+    let l:bookmarks = s:load_bookmaks()
+
+    if !has_key(s:load_bookmaks(), a:name)
+        call s:echoerr(printf('echo "Not exists in bookmark. (%s)"', a:name))
+        return
+    endif
+
+    " name
+    let l:new_name = input('Name: ', a:name)
+    if empty(l:new_name)
+        return
+    endif
+
+    " path
+    let l:path = input('Path: ', l:bookmarks[a:name])
+    if empty(l:path)
+        return
+    endif
+
+    call s:edit(a:name, l:new_name, l:path)
+    redraw!
+    echo printf('Success edited bookmark. (%s)', l:new_name)
+endfunction
+
+
+function! s:edit(old_name, new_name, path) abort
+    let l:bookmarks = s:load_bookmaks()
+    let l:path = has('win32') ? substitute(expand(a:path), '\\', '/', 'g') : a:path
+
+    if !has_key(l:bookmarks, a:new_name)
+        call s:delete(a:old_name)
+    endif
+    call s:add(a:new_name, a:path)
+endfunction
+
+
+
+
+" =====================
+" load bookmarks
+" =====================
+
+" {path: name, ...}
+function! s:load_bookmaks() abort
+    if exists('g:Lf_Bookmarks')
+        return g:Lf_Bookmarks
+    endif
+
+    if !filereadable(g:Lf_BookmarkFilePath)
+        let g:Lf_Bookmarks = {}
+        return g:Lf_Bookmarks
+    endif
+
     let l:lines = readfile(g:Lf_BookmarkFilePath)
     if l:lines == [] | return {} | endif
-
-    return json_decode(l:lines[0])
+    let g:Lf_Bookmarks = json_decode(l:lines[0])
+    return g:Lf_Bookmarks
 endfunction
 
-function! leaderf#bookmark#delete_complete(arglead, cmdline, cursorpos) abort
+
+" =====================
+" echo error
+" =====================
+function! s:echoerr(msg) abort
+    echohl ErrorMsg
+    execute a:msg
+    echohl None
+endfunction
+
+
+" =====================
+" write
+" =====================
+function! s:write(bookmarks) abort
+    let l:encoded = json_encode(a:bookmarks)
+    call writefile([l:encoded], g:Lf_BookmarkFilePath)
+endfunction
+
+
+" =====================
+" complete
+" =====================
+function! leaderf#Bookmark#name_complete(arglead, cmdline, cursorpos) abort
     return join(keys(s:load_bookmaks()), "\n")
 endfunction

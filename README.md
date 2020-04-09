@@ -12,8 +12,30 @@ or
 :Leaderf bookmark
 ```
 
+### Commands
+
 Add bookmark
 
 ```
-:BookmarkAdd {path} [{name}]
+:BookmarkAdd {name} {path}
+```
+
+or
+
+```
+:BookmarkAddHere [{name}]
+```
+
+
+Edit bookmark
+
+```
+:BookmarkEdit {name}
+```
+
+
+Delete bookmark
+
+```
+:BookmarkDelete {name}
 ```

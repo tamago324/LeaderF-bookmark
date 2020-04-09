@@ -8,7 +8,6 @@ from leaderf.utils import *
 from leaderf.explorer import *
 from leaderf.manager import *
 
-
 #*****************************************************
 # BookmarkExplorer
 #*****************************************************
@@ -21,11 +20,14 @@ class BookmarkExplorer(Explorer):
         if not os.path.exists(bookmark_filepath):
             return []
 
-        with lfOpen(bookmark_filepath) as f:
-            bookmarks = json.load(f)
-
-        if len(bookmarks) == 0:
+        try:
+            with lfOpen(bookmark_filepath) as f:
+                bookmarks = json.load(f)
+        except json.decoder.JSONDecodeError:
             return []
+
+        # if len(bookmarks) == 0:
+        #     return []
 
         # from mruExpl.py
         _max_name_len = max(
@@ -33,11 +35,11 @@ class BookmarkExplorer(Explorer):
             for line in bookmarks.values()
         )
         lines = []
-        for path, name in bookmarks.items():
+        for name, path in bookmarks.items():
             space_num = _max_name_len - int(
                 lfEval("strdisplaywidth('{}')".format(escQuote(name)))
             )
-            lines.append('{}{} "{}"'.format(name, " " * space_num, path))
+            lines.append('{}{} | {}'.format(name, " " * space_num, path))
         return lines
 
     def getStlCategory(self):
@@ -74,10 +76,22 @@ class BookmarkExplManager(Manager):
     def delete(self, *args, **kwargs):
         instance = self._getInstance()
         line = instance.currentLine
-        path = self._getDirPath(line)
+        name = self._getDigest(line, 1)
         instance.exitBuffer()
         try:
-            lfCmd('call leaderf#Bookmark#delete("{}")'.format(path))
+            lfCmd('call leaderf#Bookmark#delete("{}")'.format(name))
+        except KeyboardInterrupt:
+            pass
+        except vim.error as e:
+            lfPrintError(e)
+
+    def edit(self, *args, **kwargs):
+        instance = self._getInstance()
+        line = instance.currentLine
+        name = self._getDigest(line, 1)
+        instance.exitBuffer()
+        try:
+            lfCmd('call leaderf#Bookmark#edit("{}")'.format(name))
         except KeyboardInterrupt:
             pass
         except vim.error as e:
@@ -89,20 +103,19 @@ class BookmarkExplManager(Manager):
         if mode == 0:
             return line
         elif mode == 1:
-            start_pos = line.find(' "')
+            start_pos = line.find(' | ')
             return line[:start_pos].rstrip()
         else:
-            start_pos = line.find(' "')
-            return line[start_pos+2:-1]
+            start_pos = line.find(' | ')
+            return line[start_pos+3:]
 
     def _getDigestStartPos(self, line, mode):
         if not line:
             return 0
 
-        # TODO: --no-split-path に対応する
         if mode == 2:
-            start_pos = line.find(' "')
-            return lfBytesLen(line[:start_pos+2])
+            start_pos = line.find(' | ')
+            return lfBytesLen(line[:start_pos+3])
         else:
             return 0
 
@@ -110,13 +123,13 @@ class BookmarkExplManager(Manager):
         super(BookmarkExplManager, self)._afterEnter()
         if self._getInstance().getWinPos() == "popup":
             lfCmd(
-                """call win_execute(%d, 'let matchid = matchadd(''Lf_hl_bookmarkPath'', ''\s\+\zs".\+'')')"""
+                """call win_execute(%d, 'let matchid = matchadd(''Lf_hl_bookmarkPath'', ''\s+\zs\| .\+'')')"""
                 % self._getInstance().getPopupWinId()
             )
             id = int(lfEval("matchid"))
             self._match_ids.append(id)
         else:
-            id = int(lfEval("matchadd('Lf_hl_bookmarkPath', '\s+\zs"".+')"))
+            id = int(lfEval("matchadd('Lf_hl_bookmarkPath', '\s+\zs\| .\+')"))
             self._match_ids.append(id)
 
     def _createHelp(self):
@@ -124,6 +137,7 @@ class BookmarkExplManager(Manager):
         help.append('" <CR>/<double-click>/o : execute command under cursor')
         help.append('" i : switch to input mode')
         help.append('" d : delete bookmark under cursor')
+        help.append('" e : edit bookmark under cursor')
         help.append('" q : quit')
         help.append('" <F1> : toggle this help')
         help.append('" ---------------------------------------------------------')

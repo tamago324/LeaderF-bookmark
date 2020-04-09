@@ -17,7 +17,7 @@ let s:extension = {
             \   ]
             \ }
 
-" In order that `Leaderf ghq` is available
+" In order that `Leaderf bookmark` is available
 call g:LfRegisterPythonExtension(s:extension.name, s:extension)
 
 command! -bar -nargs=0 LeaderfBookmark Leaderf bookmark

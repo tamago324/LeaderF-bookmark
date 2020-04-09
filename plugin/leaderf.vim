@@ -8,12 +8,14 @@
 " ============================================================================
 
 let g:Lf_BookmarkFilePath = expand(get(g:, 'Lf_BookmarkFilePath', '~/.LfBookmarks'))
-if has('win32')
-    let g:Lf_BookmarkFilePath = substitute(g:Lf_BookmarkFilePath, '\\', '/', 'g')
-endif
+let g:Lf_BookmarkFilePath = 
+\   has('win32') 
+\       ? substitute(g:Lf_BookmarkFilePath, '\\', '/', 'g')
+\       : g:Lf_BookmarkFilePath
 
 let g:Lf_BookmarkAcceptSelectionCmd = get(g:, 'Lf_BookmarkAcceptSelectionCmd', 'edit')
 
-command! -nargs=+ -complete=file BookmarkAdd call leaderf#Bookmark#add(<f-args>)
-command! -nargs=1 -complete=custom,leaderf#bookmark#delete_complete
-\           BookmarkDelete call leaderf#Bookmark#delete(<f-args>)
+command! -nargs=+ -complete=file BookmarkAdd     call leaderf#Bookmark#add(<f-args>)
+command! -nargs=?                BookmarkAddHere call leaderf#Bookmark#add_here(<f-args>)
+command! -nargs=1 -complete=custom,leaderf#Bookmark#name_complete BookmarkEdit   call leaderf#Bookmark#edit(<f-args>)
+command! -nargs=1 -complete=custom,leaderf#Bookmark#name_complete BookmarkDelete call leaderf#Bookmark#delete(<f-args>)
