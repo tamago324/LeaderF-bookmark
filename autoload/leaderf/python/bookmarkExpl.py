@@ -13,9 +13,14 @@ from leaderf.manager import *
 #*****************************************************
 class BookmarkExplorer(Explorer):
     def __init__(self):
-        pass
+        self._content = []
 
     def getContent(self, *args, **kwargs):
+        if self._content:
+            return self._content
+        return self.getFreshContent()
+
+    def getFreshContent(self, *args, **kwargs):
         bookmark_filepath = lfEval("g:Lf_BookmarkFilePath")
         if not os.path.exists(bookmark_filepath):
             return []
@@ -40,6 +45,8 @@ class BookmarkExplorer(Explorer):
                 lfEval("strdisplaywidth('{}')".format(escQuote(name)))
             )
             lines.append('{}{} | {}'.format(name, " " * space_num, path))
+
+        self._content = lines
         return lines
 
     def getStlCategory(self):
@@ -74,28 +81,53 @@ class BookmarkExplManager(Manager):
         lfCmd("{} {}".format(cmd, path))
 
     def delete(self, *args, **kwargs):
+        if self._inHelpLines():
+            return
+
         instance = self._getInstance()
         line = instance.currentLine
+        if line == '':
+            return
+
+        # from bufExpl.py
+        if instance.getWinPos() == 'popup':
+            lfCmd("call win_execute(%d, 'setlocal modifiable')" % instance.getPopupWinId())
+        else:
+            lfCmd("setlocal modifiable")
+        if len(self._content) > 0:
+            self._content.remove(line)
+            self._getInstance().setStlTotal(len(self._content)//self._getUnit())
+            self._getInstance().setStlResultsCount(len(self._content)//self._getUnit())
+
         name = self._getDigest(line, 1)
-        instance.exitBuffer()
         try:
             lfCmd('call leaderf#Bookmark#delete("{}")'.format(name))
         except KeyboardInterrupt:
             pass
+            return
         except vim.error as e:
             lfPrintError(e)
+            return
+
+        del instance._buffer_object[instance.window.cursor[0] - 1]
+        if instance.getWinPos() == 'popup':
+            instance.refreshPopupStatusline()
+            lfCmd("call win_execute(%d, 'setlocal nomodifiable')" % instance.getPopupWinId())
+        else:
+            lfCmd("setlocal nomodifiable")
 
     def edit(self, *args, **kwargs):
         instance = self._getInstance()
         line = instance.currentLine
         name = self._getDigest(line, 1)
-        instance.exitBuffer()
         try:
             lfCmd('call leaderf#Bookmark#edit("{}")'.format(name))
         except KeyboardInterrupt:
-            pass
+            return
         except vim.error as e:
             lfPrintError(e)
+            return
+        self.refresh(normal_mode=False)
 
     def _getDigest(self, line, mode):
         if not line:
