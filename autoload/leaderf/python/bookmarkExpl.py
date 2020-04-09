@@ -13,11 +13,9 @@ from leaderf.manager import *
 #*****************************************************
 class BookmarkExplorer(Explorer):
     def __init__(self):
-        self._content = []
+        pass
 
     def getContent(self, *args, **kwargs):
-        if self._content:
-            return self._content
         return self.getFreshContent()
 
     def getFreshContent(self, *args, **kwargs):
@@ -30,9 +28,6 @@ class BookmarkExplorer(Explorer):
                 bookmarks = json.load(f)
         except json.decoder.JSONDecodeError:
             return []
-
-        # if len(bookmarks) == 0:
-        #     return []
 
         # from mruExpl.py
         _max_name_len = max(
