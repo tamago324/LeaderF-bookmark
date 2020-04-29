@@ -37,12 +37,6 @@ COMMANDS~                                           *LeaderF-bookmark-commands*
     Add cwd with {name}.
     If {name} is not specified, the directory name will be the bookmark name.
 
-:BookmarkEdit {name}                                            *:BookmarkEdit*
-    Edit bookmark at {name}.
-
-:BookmarkDelete {name}                                        *:BookmarkDelete*
-    Delete bookmark at {name}.
-
 ------------------------------------------------------------------------------
 FUNCTIONS~
 
@@ -51,12 +45,6 @@ leaderf#bookmark#add({name}, {path})                   *leaderf#bookmark#add()*
 
 leaderf#bookmark#add_here([{name}])               *leaderf#bookmark#add_here()*
     Function version of |:BookmarkAddHere|.
-
-leaderf#bookmark#edit({name})                         *leaderf#bookmark#edit()*
-    Function version of |:BookmarkEdit|.
-
-leaderf#bookmark#delete({name})                     *leaderf#bookmark#delete()*
-    Function version of |:BookmarkDelete|.
 
 ------------------------------------------------------------------------------
 HIGHLIGHTS~
@@ -67,6 +55,14 @@ Lf_hl_bookmarkPath                                         *Lf_hl_bookmarkPath*
 
 ==============================================================================
 CHANGELOG                                          *LeaderF-bookmark-changelog*
+
+0.0.2   2020-04-30
+    - Remove commands
+        - `:BookmarkEdit`
+        - `:BookmarkDelete`
+    - Remove functions
+        - `:leaderf#Bookmark#edit()`
+        - `:leaderf#Bookmark#delete()`
 
 0.0.1   2020-04-09
     - Initial version.

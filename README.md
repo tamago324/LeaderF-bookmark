@@ -29,13 +29,9 @@ or
 
 Edit bookmark
 
-```
-:BookmarkEdit {name}
-```
+`e` in normal mode.
 
 
 Delete bookmark
 
-```
-:BookmarkDelete {name}
-```
+`d` in normal mode.

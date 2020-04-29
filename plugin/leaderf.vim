@@ -17,5 +17,3 @@ let g:Lf_BookmarkAcceptSelectionCmd = get(g:, 'Lf_BookmarkAcceptSelectionCmd', '
 
 command! -nargs=+ -complete=file BookmarkAdd     call leaderf#Bookmark#add(<f-args>)
 command! -nargs=?                BookmarkAddHere call leaderf#Bookmark#add_here(<f-args>)
-command! -nargs=1 -complete=custom,leaderf#Bookmark#name_complete BookmarkEdit   call leaderf#Bookmark#edit(<f-args>)
-command! -nargs=1 -complete=custom,leaderf#Bookmark#name_complete BookmarkDelete call leaderf#Bookmark#delete(<f-args>)
