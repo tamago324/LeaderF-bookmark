@@ -2,15 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-from bookmark.commands.input import (
-    command___input_cancel,
-    get_context,
-    input_prompt,
-    restore_context,
-    save_context,
-    switch_normal_mode,
-    do_command
-)
+from bookmark.commands.input import do_command, input_prompt, save_context
 from bookmark.utils import NO_CONTENT_MSG, echo_cancel, echo_error
 from leaderf.utils import lfCmd, lfEval
 
@@ -31,15 +23,15 @@ def command__edit(manager):
     input_prompt(
         manager,
         "edit",
-        "(Edit) Path: ",
-        path,
-        [{"prompt": "(Edit) Name: ", "text": name}],
+        [
+            {"prompt": "(Edit) Path: ", "text": path},
+            {"prompt": "(Edit) Name: ", "text": name},
+        ],
     )
 
 
-@do_command
-def command___do_edit(manager, results):
-    ctx = get_context()
+@do_command()
+def command___do_edit(manager, context, results):
     new_path = results[0]
     new_name = results[1]
 
@@ -47,18 +39,14 @@ def command___do_edit(manager, results):
         echo_cancel()
         return
 
-    if new_name in lfEval("leaderf#Bookmark#load_bookmaks()"):
+    if context.get("old_name") != new_name and new_name in lfEval(
+        "leaderf#Bookmark#load_bookmaks()"
+    ):
         echo_error("Already exists in bookmark '{}'".format(new_name))
         return
 
-    try:
-        lfCmd(
-            'call leaderf#Bookmark#_edit("{}", "{}", "{}")'.format(
-                ctx["old_name"], new_name, new_path
-            )
+    lfCmd(
+        'call leaderf#Bookmark#_edit("{}", "{}", "{}")'.format(
+            context["old_name"], new_name, new_path
         )
-    finally:
-        restore_context(manager, restore_input_pattern=False, restore_cursor_pos=False)
-        switch_normal_mode(manager)
-    manager._instance._cli.setPattern("")
-    manager.refresh()
+    )

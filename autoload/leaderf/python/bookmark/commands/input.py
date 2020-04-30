@@ -22,8 +22,8 @@ _context = {}
 
 
 def command___input_cancel(manager):
-    restore_context(manager)
-    switch_normal_mode(manager)
+    _restore_context(manager)
+    _switch_normal_mode(manager)
 
 
 def command___input_prompt(manager):
@@ -46,7 +46,7 @@ def command___input_prompt(manager):
     manager._instance._cli.setPattern(text)
 
     key_dict = manager._instance._cli._key_dict
-    if len(prompts[1:]) == 0:
+    if len(prompts) == 1:
         # done
         key_dict["<CR>"] = "_do_" + command
     else:
@@ -54,25 +54,26 @@ def command___input_prompt(manager):
     manager._instance._cli._key_dict = key_dict
 
 
-def input_prompt(manager, command, prompt, text="", prompts=[]):
+def input_prompt(manager, command, prompts=[]):
     """
     params:
         command:
             "delete" or "edit" or ("add")
             When <CR> is pressed, manager.command___co_{command}() is executed.
-        prompt:
-            prompt string
-        text:
-            default value
         prompts:
-            define multiple input prompts
-            [{"prompt": prompt, "text": text}, ...]
+            input prompts
+            [
+                {"prompt": prompt1, "text": text1},
+                ...
+            ]
     """
     global _context
-    _context["input_prompt_prompts"] = prompts
+    _context["input_prompt_prompts"] = prompts[1:]
     _context["input_prompt_command"] = command
 
     # set pattern
+    prompt = prompts[0].get("prompt", "")
+    text = prompts[0].get("text", "")
     manager._instance._cli._additional_prompt_string = prompt
     manager._instance._cli.setPattern(text)
 
@@ -108,13 +109,49 @@ def input_prompt(manager, command, prompt, text="", prompts=[]):
         if rhs_low in {"<esc>", "<c-c>"}:
             key_dict[lrs] = "_input_cancel"
     # add command
-    if len(prompts) == 0:
+    if len(prompts) == 1:
         key_dict["<CR>"] = "_do_" + command
     else:
         # chain
         key_dict["<CR>"] = "_input_prompt"
     manager._instance._cli._key_dict = key_dict
     manager.input()
+
+
+def do_command(need_refresh=True):
+    """
+        params:
+            need_refresh
+
+        example)
+            @do_command()
+            def command___do_xxx(manager, context, results):
+                ...
+    """
+
+    def decorator(func):
+        # Give a list of input results to a function
+        def inner_func(manager):
+            # The first argument must be manager
+            global _context
+            results = _context.get("results", [])
+            results.append(manager._instance._cli.pattern)
+
+            try:
+                func(manager, _context, results)
+            finally:
+                _restore_context(
+                    manager, restore_input_pattern=False, restore_cursor_pos=False
+                )
+                _switch_normal_mode(manager)
+                manager._instance._cli.setPattern("")
+
+            if need_refresh:
+                manager.refresh()
+
+        return inner_func
+
+    return decorator
 
 
 def save_context(manager, **kwargs):
@@ -136,7 +173,7 @@ def save_context(manager, **kwargs):
     manager._search = lambda content, is_continue=False, step=0: ""
 
 
-def restore_context(manager, restore_input_pattern=True, restore_cursor_pos=True):
+def _restore_context(manager, restore_input_pattern=True, restore_cursor_pos=True):
     """ For input_prompt
 
     params:
@@ -171,7 +208,7 @@ def restore_context(manager, restore_input_pattern=True, restore_cursor_pos=True
     _context = {}
 
 
-def switch_normal_mode(manager):
+def _switch_normal_mode(manager):
     lfCmd(r'call feedkeys("{}", "n")'.format(_get_switch_normal_mode_key(manager)))
 
 
@@ -193,18 +230,3 @@ def _get_switch_normal_mode_key(manager):
         # <Tab> => \<Tab>
         _switch_normal_mode_key = keys[0].replace("<", r"\<")
     return _switch_normal_mode_key
-
-
-def get_context():
-    return _context
-
-
-def do_command(func):
-    # Give a list of input results to a function
-    def wrapper(manager):
-        # The first argument must be manager
-        global _context
-        results = _context.get("results", [])
-        results.append(manager._instance._cli.pattern)
-        return func(manager, results)
-    return wrapper

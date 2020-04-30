@@ -7,12 +7,9 @@ import re
 
 from bookmark.commands.input import (
     command___input_cancel,
-    get_context,
-    input_prompt,
-    restore_context,
-    save_context,
-    switch_normal_mode,
     do_command,
+    input_prompt,
+    save_context,
 )
 from bookmark.utils import NO_CONTENT_MSG
 from leaderf.utils import lfCmd
@@ -31,23 +28,18 @@ def command__delete(manager):
 
     save_context(manager, **{"current_line": line, "name": name})
     # confirm
-    input_prompt(manager, "delete", "Delete {}? Y[es]/n[o]: ".format(name))
+    input_prompt(
+        manager, "delete", [{"prompt": "Delete {}? Y[es]/n[o]: ".format(name)}]
+    )
 
 
-@do_command
-def command___do_delete(manager, results):
+@do_command()
+def command___do_delete(manager, context, results):
     if not yes(results[0]):
         command___input_cancel(manager)
         return
 
-    ctx = get_context()
-    try:
-        lfCmd("call leaderf#Bookmark#_delete('{}')".format(ctx["name"]))
-    finally:
-        restore_context(manager, restore_input_pattern=False, restore_cursor_pos=False)
-        switch_normal_mode(manager)
-    manager._instance._cli.setPattern("")
-    manager.refresh()
+    lfCmd("call leaderf#Bookmark#_delete('{}')".format(context["name"]))
 
 
 def yes(result, default_yes=True):
