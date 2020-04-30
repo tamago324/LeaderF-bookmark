@@ -14,7 +14,7 @@ or
 
 ### Commands
 
-Add bookmark
+#### Add bookmark
 
 ```
 :BookmarkAdd {name} {path}
@@ -26,12 +26,16 @@ or
 :BookmarkAddHere [{name}]
 ```
 
+or
 
-Edit bookmark
-
-`e` in normal mode.
+`N` in normal mode.
 
 
-Delete bookmark
+#### Edit bookmark
 
-`d` in normal mode.
+`E` in normal mode.
+
+
+#### Delete bookmark
+
+`D` in normal mode.
