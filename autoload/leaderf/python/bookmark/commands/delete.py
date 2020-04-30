@@ -12,6 +12,7 @@ from bookmark.commands.input import (
     restore_context,
     save_context,
     switch_normal_mode,
+    do_command,
 )
 from bookmark.utils import NO_CONTENT_MSG
 from leaderf.utils import lfCmd
@@ -33,10 +34,9 @@ def command__delete(manager):
     input_prompt(manager, "delete", "Delete {}? Y[es]/n[o]: ".format(name))
 
 
-def command___do_delete(manager):
-    result = manager._instance._cli.pattern
-
-    if not yes(result):
+@do_command
+def command___do_delete(manager, results):
+    if not yes(results[0]):
         command___input_cancel(manager)
         return
 

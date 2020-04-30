@@ -16,7 +16,7 @@ _context = {}
 # cli_cursor_pos
 # cli_pattern
 # cursor_pos
-# result_set
+# results
 # input_prompt_prompts
 # input_prompt_command
 
@@ -33,9 +33,9 @@ def command___input_prompt(manager):
 
     # Chains the input prompt
     # Save the previous input value.
-    if "result_set" not in _context:
-        _context["result_set"] = []
-    _context["result_set"].append(manager._instance._cli.pattern)
+    if "results" not in _context:
+        _context["results"] = []
+    _context["results"].append(manager._instance._cli.pattern)
 
     _context["input_prompt_prompts"] = prompts[1:]
 
@@ -197,3 +197,14 @@ def _get_switch_normal_mode_key(manager):
 
 def get_context():
     return _context
+
+
+def do_command(func):
+    # Give a list of input results to a function
+    def wrapper(manager):
+        # The first argument must be manager
+        global _context
+        results = _context.get("results", [])
+        results.append(manager._instance._cli.pattern)
+        return func(manager, results)
+    return wrapper

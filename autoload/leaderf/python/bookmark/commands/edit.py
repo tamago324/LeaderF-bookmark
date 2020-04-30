@@ -9,6 +9,7 @@ from bookmark.commands.input import (
     restore_context,
     save_context,
     switch_normal_mode,
+    do_command
 )
 from bookmark.utils import NO_CONTENT_MSG, echo_cancel, echo_error
 from leaderf.utils import lfCmd, lfEval
@@ -26,7 +27,7 @@ def command__edit(manager):
     name = manager._getDigest(line, 1)
     path = manager._getDigest(line, 2)
 
-    save_context(manager, **{"old_name": name, "path": path})
+    save_context(manager, **{"old_name": name})
     input_prompt(
         manager,
         "edit",
@@ -36,10 +37,13 @@ def command__edit(manager):
     )
 
 
-def command___do_edit(manager):
+@do_command
+def command___do_edit(manager, results):
     ctx = get_context()
-    new_name = ctx.get("result_set", [])[0]
-    if len(new_name.strip()) == 0 or len(ctx["path"].strip()) == 0:
+    new_name = results[0]
+    new_path = results[1]
+
+    if len(new_name.strip()) == 0 or len(new_path.strip()) == 0:
         echo_cancel()
 
     if new_name in lfEval("leaderf#Bookmark#load_bookmaks()"):
@@ -48,7 +52,7 @@ def command___do_edit(manager):
     try:
         lfCmd(
             'call leaderf#Bookmark#_edit("{}", "{}", "{}")'.format(
-                ctx["old_name"], new_name, ctx["path"]
+                ctx["old_name"], new_name, new_path
             )
         )
     finally:
