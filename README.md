@@ -12,30 +12,10 @@ or
 :Leaderf bookmark
 ```
 
-### Commands
+### Mappings
 
-#### Add bookmark
-
-```
-:BookmarkAdd {name} {path}
-```
-
-or
-
-```
-:BookmarkAddHere [{name}]
-```
-
-or
-
-`N` in normal mode.
-
-
-#### Edit bookmark
-
-`E` in normal mode.
-
-
-#### Delete bookmark
-
-`D` in normal mode.
+| key | command         |
+|-----|-----------------|
+| N   | add bookmark    |
+| E   | edit bookmark   |
+| D   | delete bookmark |

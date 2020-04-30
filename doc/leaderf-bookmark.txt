@@ -30,13 +30,6 @@ COMMANDS~                                           *LeaderF-bookmark-commands*
 :LeaderfBookmark                                             *:LeaderfBookmark*
     Launch LeaderF to navigate the bookmark.
 
-:BookmarkAdd {name} {path}                                       *:BookmarkAdd*
-    Add directory {path} with {name}.
-
-:BookmarkAddHere [{name}]                                    *:BookmarkAddHere*
-    Add cwd with {name}.
-    If {name} is not specified, the directory name will be the bookmark name.
-
 
 ------------------------------------------------------------------------------
 MAPPINGS~                                           *LeaderF-bookmark-mappings*
@@ -50,16 +43,6 @@ E     edit bookmark
 D     delete bookmark
 
 
-
-------------------------------------------------------------------------------
-FUNCTIONS~
-
-leaderf#bookmark#add({name}, {path})                   *leaderf#bookmark#add()*
-    Function version of |:BookmarkAdd|.
-
-leaderf#bookmark#add_here([{name}])               *leaderf#bookmark#add_here()*
-    Function version of |:BookmarkAddHere|.
-
 ------------------------------------------------------------------------------
 HIGHLIGHTS~
 
@@ -70,6 +53,14 @@ Lf_hl_bookmarkPath                                         *Lf_hl_bookmarkPath*
 ==============================================================================
 CHANGELOG                                          *LeaderF-bookmark-changelog*
 
+
+0.0.4   2020-04-30
+    - Remove commands.
+        - `:BookmarkAdd`
+        - `:BookmarkAddHere`
+    - Remove functions
+        - `leaderf#bookmark#add`()
+        - `leaderf#bookmark#add_here()`
 
 0.0.3   2020-04-30
     - Add `add` command

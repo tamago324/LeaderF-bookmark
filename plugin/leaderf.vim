@@ -14,6 +14,3 @@ let g:Lf_BookmarkFilePath =
 \       : g:Lf_BookmarkFilePath
 
 let g:Lf_BookmarkAcceptSelectionCmd = get(g:, 'Lf_BookmarkAcceptSelectionCmd', 'edit')
-
-command! -nargs=+ -complete=file BookmarkAdd     call leaderf#Bookmark#add(<f-args>)
-command! -nargs=?                BookmarkAddHere call leaderf#Bookmark#add_here(<f-args>)

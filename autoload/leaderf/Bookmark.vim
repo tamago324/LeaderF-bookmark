@@ -136,40 +136,6 @@ endfunction
 " =====================
 " add
 " =====================
-function! leaderf#Bookmark#add(name, path) abort
-    let l:path = has('win32') ? substitute(expand(a:path), '\\', '/', 'g') : a:path
-
-    " Add when not exists.
-    let l:bookmarks = leaderf#Bookmark#load_bookmaks()
-    if has_key(l:bookmarks, a:name)
-        call s:echoerr(printf('echo "Already exists in bookmark. (%s)"', a:name))
-        return
-    endif
-
-    call leaderf#Bookmark#_add(a:name, l:path)
-    execute printf('echo "Success added bookmark. (%s => %s)"', a:name, l:path)
-endfunction
-
-
-" ---------------------
-" add here
-" ---------------------
-function! leaderf#Bookmark#add_here(...) abort
-    let l:path = has('win32') ? substitute(expand(getcwd()), '\\', '/', 'g') : getcwd()
-    let l:name = get(a:, 1, fnamemodify(l:path, ':t'))
-
-    let yn = input(printf('Add ''%s'' (y/N)? ', l:name))
-    echo "\n"
-    if empty(yn) || yn ==? 'n'
-        echo 'Cancelled.'
-        return
-    endif
-
-    call leaderf#Bookmark#add(l:name, l:path)
-endfunction
-
-
-
 function! leaderf#Bookmark#_add(name, path) abort
     echomsg a:path
     let l:path = has('win32') ? substitute(expand(a:path), '\\', '/', 'g') : a:path
@@ -246,12 +212,4 @@ endfunction
 function! s:write(bookmarks) abort
     let l:encoded = json_encode(a:bookmarks)
     call writefile([l:encoded], g:Lf_BookmarkFilePath)
-endfunction
-
-
-" =====================
-" complete
-" =====================
-function! leaderf#Bookmark#name_complete(arglead, cmdline, cursorpos) abort
-    return join(keys(leaderf#Bookmark#load_bookmaks()), "\n")
 endfunction
