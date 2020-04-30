@@ -10,7 +10,7 @@ from bookmark.commands.input import (
     save_context,
     switch_normal_mode,
 )
-from bookmark.utils import echo_cancel, echo_error, NO_CONTENT_MSG
+from bookmark.utils import NO_CONTENT_MSG, echo_cancel, echo_error
 from leaderf.utils import lfCmd, lfEval
 
 
@@ -54,5 +54,5 @@ def command___do_edit(manager):
     finally:
         restore_context(manager, restore_input_pattern=False, restore_cursor_pos=False)
         switch_normal_mode(manager)
-    manager._instance._cli.setPattern('')
+    manager._instance._cli.setPattern("")
     manager.refresh()

@@ -40,8 +40,8 @@ def command___input_prompt(manager):
     _context["input_prompt_prompts"] = prompts[1:]
 
     # reset prompt text
-    prompt = prompts[0].get('prompt')
-    text = prompts[0].get('text', '')
+    prompt = prompts[0].get("prompt")
+    text = prompts[0].get("text", "")
     manager._instance._cli._additional_prompt_string = prompt
     manager._instance._cli.setPattern(text)
 

@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from leaderf.utils import lfCmd, escQuote
-
+from leaderf.utils import escQuote, lfCmd
 
 NO_CONTENT_MSG = " No content!"
 

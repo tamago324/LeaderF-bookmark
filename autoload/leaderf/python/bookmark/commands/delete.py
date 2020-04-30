@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 
+# from bookmark.utils import echo_cancel
+import re
+
 from bookmark.commands.input import (
     command___input_cancel,
     get_context,
@@ -10,10 +13,8 @@ from bookmark.commands.input import (
     save_context,
     switch_normal_mode,
 )
-from leaderf.utils import lfCmd
 from bookmark.utils import NO_CONTENT_MSG
-# from bookmark.utils import echo_cancel
-import re
+from leaderf.utils import lfCmd
 
 
 def command__delete(manager):
@@ -27,7 +28,7 @@ def command__delete(manager):
 
     name = manager._getDigest(line, 1)
 
-    save_context(manager, **{'current_line': line, 'name': name})
+    save_context(manager, **{"current_line": line, "name": name})
     # confirm
     input_prompt(manager, "delete", "Delete {}? Y[es]/n[o]: ".format(name))
 

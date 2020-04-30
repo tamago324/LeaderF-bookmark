@@ -1,18 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import json
 import os
 import os.path
-import json
-from leaderf.utils import *
+
+from bookmark.cmd import Cmd
+from bookmark.utils import NO_CONTENT_MSG, echo_error
 from leaderf.explorer import *
 from leaderf.manager import *
-from bookmark.cmd import Cmd
-from bookmark.utils import echo_error, NO_CONTENT_MSG
+from leaderf.utils import *
 
-#*****************************************************
+
+# *****************************************************
 # BookmarkExplorer
-#*****************************************************
+# *****************************************************
 class BookmarkExplorer(Explorer):
     def __init__(self):
         pass
@@ -44,7 +46,7 @@ class BookmarkExplorer(Explorer):
             space_num = _max_name_len - int(
                 lfEval("strdisplaywidth('{}')".format(escQuote(name)))
             )
-            lines.append('{}{} | {}'.format(name, " " * space_num, path))
+            lines.append("{}{} | {}".format(name, " " * space_num, path))
 
         self._content = lines
         return lines
@@ -59,9 +61,9 @@ class BookmarkExplorer(Explorer):
         return True
 
 
-#*****************************************************
+# *****************************************************
 # BookmarkExplManager
-#*****************************************************
+# *****************************************************
 class BookmarkExplManager(Manager):
     def __init__(self):
         super(BookmarkExplManager, self).__init__()
@@ -103,19 +105,19 @@ class BookmarkExplManager(Manager):
         if mode == 0:
             return line
         elif mode == 1:
-            start_pos = line.find(' | ')
+            start_pos = line.find(" | ")
             return line[:start_pos].rstrip()
         else:
-            start_pos = line.find(' | ')
-            return line[start_pos+3:]
+            start_pos = line.find(" | ")
+            return line[start_pos + 3 :]
 
     def _getDigestStartPos(self, line, mode):
         if not line:
             return 0
 
         if mode == 2:
-            start_pos = line.find(' | ')
-            return lfBytesLen(line[:start_pos+3])
+            start_pos = line.find(" | ")
+            return lfBytesLen(line[: start_pos + 3])
         else:
             return 0
 
@@ -144,9 +146,9 @@ class BookmarkExplManager(Manager):
         return help
 
 
-#*****************************************************
+# *****************************************************
 # bookmarkExplManager is a singleton
-#*****************************************************
+# *****************************************************
 bookmarkExplManager = BookmarkExplManager()
 
 __all__ = ["bookmarkExplManager"]
