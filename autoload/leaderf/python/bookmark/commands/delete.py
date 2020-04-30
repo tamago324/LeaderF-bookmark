@@ -11,6 +11,7 @@ from bookmark.commands.input import (
     switch_normal_mode,
 )
 from leaderf.utils import lfCmd
+from bookmark.utils import NO_CONTENT_MSG
 # from bookmark.utils import echo_cancel
 import re
 
@@ -20,6 +21,10 @@ def command__delete(manager):
         return
 
     line = manager._instance.currentLine
+
+    if line == NO_CONTENT_MSG:
+        return
+
     name = manager._getDigest(line, 1)
 
     save_context(manager, **{'current_line': line, 'name': name})

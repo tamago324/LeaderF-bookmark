@@ -8,7 +8,7 @@ from leaderf.utils import *
 from leaderf.explorer import *
 from leaderf.manager import *
 from bookmark.cmd import Cmd
-from bookmark.utils import echo_error
+from bookmark.utils import echo_error, NO_CONTENT_MSG
 
 #*****************************************************
 # BookmarkExplorer
@@ -30,6 +30,9 @@ class BookmarkExplorer(Explorer):
                 bookmarks = json.load(f)
         except json.decoder.JSONDecodeError:
             return []
+
+        if len(bookmarks) == 0:
+            return [NO_CONTENT_MSG]
 
         # from mruExpl.py
         _max_name_len = max(

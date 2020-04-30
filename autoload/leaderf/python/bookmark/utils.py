@@ -4,6 +4,9 @@
 from leaderf.utils import lfCmd, escQuote
 
 
+NO_CONTENT_MSG = " No content!"
+
+
 def echo_cancel():
     lfCmd("echon ' Canceled.'")
 

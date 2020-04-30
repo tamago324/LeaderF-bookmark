@@ -10,7 +10,7 @@ from bookmark.commands.input import (
     save_context,
     switch_normal_mode,
 )
-from bookmark.utils import echo_cancel, echo_error
+from bookmark.utils import echo_cancel, echo_error, NO_CONTENT_MSG
 from leaderf.utils import lfCmd, lfEval
 
 
@@ -19,6 +19,10 @@ def command__edit(manager):
         return
 
     line = manager._instance.currentLine
+
+    if line == NO_CONTENT_MSG:
+        return
+
     name = manager._getDigest(line, 1)
     path = manager._getDigest(line, 2)
 
