@@ -19,10 +19,10 @@ from leaderf.utils import lfCmd
 
 
 def command__delete(manager):
+    line = manager._instance.currentLine
+
     if manager._inHelpLines():
         return
-
-    line = manager._instance.currentLine
 
     if line == NO_CONTENT_MSG:
         return
@@ -43,10 +43,11 @@ def command___do_delete(manager, results):
     ctx = get_context()
     try:
         lfCmd("call leaderf#Bookmark#_delete('{}')".format(ctx["name"]))
-        manager.refresh()
     finally:
         restore_context(manager, restore_input_pattern=False, restore_cursor_pos=False)
         switch_normal_mode(manager)
+    manager._instance._cli.setPattern("")
+    manager.refresh()
 
 
 def yes(result, default_yes=True):

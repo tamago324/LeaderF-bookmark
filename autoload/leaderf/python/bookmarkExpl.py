@@ -138,8 +138,9 @@ class BookmarkExplManager(Manager):
         help = []
         help.append('" <CR>/<double-click>/o : execute command under cursor')
         help.append('" i : switch to input mode')
-        help.append('" d : delete bookmark under cursor')
-        help.append('" e : edit bookmark under cursor')
+        help.append('" N : add bookmark')
+        help.append('" D : delete bookmark under cursor')
+        help.append('" E : edit bookmark under cursor')
         help.append('" q : quit')
         help.append('" <F1> : toggle this help')
         help.append('" ---------------------------------------------------------')

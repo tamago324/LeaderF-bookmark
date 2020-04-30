@@ -24,8 +24,9 @@ function! leaderf#Bookmark#Maps()
     nnoremap <buffer> <silent> q             :exec g:Lf_py "bookmarkExplManager.quit()"<CR>
     nnoremap <buffer> <silent> <Tab>         :exec g:Lf_py "bookmarkExplManager.input()"<CR>
     nnoremap <buffer> <silent> <F1>          :exec g:Lf_py "bookmarkExplManager.toggleHelp()"<CR>
-    nnoremap <buffer> <silent> d             :exec g:Lf_py "bookmarkExplManager.do_command('delete')"<CR>
-    nnoremap <buffer> <silent> e             :exec g:Lf_py "bookmarkExplManager.do_command('edit')"<CR>
+    nnoremap <buffer> <silent> D             :exec g:Lf_py "bookmarkExplManager.do_command('delete')"<CR>
+    nnoremap <buffer> <silent> E             :exec g:Lf_py "bookmarkExplManager.do_command('edit')"<CR>
+    nnoremap <buffer> <silent> N             :exec g:Lf_py "bookmarkExplManager.do_command('add')"<CR>
     if has_key(g:Lf_NormalMap, "Bookmark")
         for i in g:Lf_NormalMap["Bookmark"]
             exec 'nnoremap <buffer> <silent> '.i[0].' '.i[1]
@@ -114,10 +115,12 @@ function! leaderf#Bookmark#NormalModeFilter(winid, key) abort
         exec g:Lf_py "bookmarkExplManager.accept()"
     elseif key ==? "<F1>"
         exec g:Lf_py "bookmarkExplManager.toggleHelp()"
-    elseif key ==? "d"
+    elseif key ==# "D"
         exec g:Lf_py "bookmarkExplManager.do_command('delete')"
-    elseif key ==? "e"
+    elseif key ==# "E"
         exec g:Lf_py "bookmarkExplManager.do_command('edit')"
+    elseif key ==# "N"
+        exec g:Lf_py "bookmarkExplManager.do_command('add')"
     else
         if key ==# '^\w+$'
             " No error is shown
@@ -143,7 +146,7 @@ function! leaderf#Bookmark#add(name, path) abort
         return
     endif
 
-    call s:add(a:name, l:path)
+    call leaderf#Bookmark#_add(a:name, l:path)
     execute printf('echo "Success added bookmark. (%s => %s)"', a:name, l:path)
 endfunction
 
@@ -167,7 +170,8 @@ endfunction
 
 
 
-function! s:add(name, path) abort
+function! leaderf#Bookmark#_add(name, path) abort
+    echomsg a:path
     let l:path = has('win32') ? substitute(expand(a:path), '\\', '/', 'g') : a:path
     let l:bookmarks = leaderf#Bookmark#load_bookmaks()
     let l:bookmarks[a:name] = l:path
@@ -198,7 +202,7 @@ function! leaderf#Bookmark#_edit(old_name, new_name, path) abort
     if !has_key(l:bookmarks, a:new_name)
         call leaderf#Bookmark#_delete(a:old_name)
     endif
-    call s:add(a:new_name, a:path)
+    call leaderf#Bookmark#_add(a:new_name, a:path)
 endfunction
 
 

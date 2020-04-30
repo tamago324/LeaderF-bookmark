@@ -37,6 +37,20 @@ COMMANDS~                                           *LeaderF-bookmark-commands*
     Add cwd with {name}.
     If {name} is not specified, the directory name will be the bookmark name.
 
+
+------------------------------------------------------------------------------
+MAPPINGS~                                           *LeaderF-bookmark-mappings*
+
+Normal mode mappings
+
+ lhs   command
+----- ---------
+N     add bookmark
+E     edit bookmark
+D     delete bookmark
+
+
+
 ------------------------------------------------------------------------------
 FUNCTIONS~
 
@@ -55,6 +69,10 @@ Lf_hl_bookmarkPath                                         *Lf_hl_bookmarkPath*
 
 ==============================================================================
 CHANGELOG                                          *LeaderF-bookmark-changelog*
+
+
+0.0.3   2020-04-30
+    - Add `add` command
 
 0.0.2   2020-04-30
     - Remove commands

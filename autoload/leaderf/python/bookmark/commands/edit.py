@@ -31,23 +31,25 @@ def command__edit(manager):
     input_prompt(
         manager,
         "edit",
-        "(Edit) Name: ",
-        name,
-        [{"prompt": "(Edit) Path: ", "text": path}],
+        "(Edit) Path: ",
+        path,
+        [{"prompt": "(Edit) Name: ", "text": name}],
     )
 
 
 @do_command
 def command___do_edit(manager, results):
     ctx = get_context()
-    new_name = results[0]
-    new_path = results[1]
+    new_path = results[0]
+    new_name = results[1]
 
     if len(new_name.strip()) == 0 or len(new_path.strip()) == 0:
         echo_cancel()
+        return
 
     if new_name in lfEval("leaderf#Bookmark#load_bookmaks()"):
         echo_error("Already exists in bookmark '{}'".format(new_name))
+        return
 
     try:
         lfCmd(
