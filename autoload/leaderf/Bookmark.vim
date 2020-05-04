@@ -26,7 +26,8 @@ function! leaderf#Bookmark#Maps()
     nnoremap <buffer> <silent> <F1>          :exec g:Lf_py "bookmarkExplManager.toggleHelp()"<CR>
     nnoremap <buffer> <silent> D             :exec g:Lf_py "bookmarkExplManager.do_command('delete')"<CR>
     nnoremap <buffer> <silent> E             :exec g:Lf_py "bookmarkExplManager.do_command('edit')"<CR>
-    nnoremap <buffer> <silent> N             :exec g:Lf_py "bookmarkExplManager.do_command('add')"<CR>
+    nnoremap <buffer> <silent> K             :exec g:Lf_py "bookmarkExplManager.do_command('add_dir')"<CR>
+    nnoremap <buffer> <silent> N             :exec g:Lf_py "bookmarkExplManager.do_command('add_file')"<CR>
     if has_key(g:Lf_NormalMap, "Bookmark")
         for i in g:Lf_NormalMap["Bookmark"]
             exec 'nnoremap <buffer> <silent> '.i[0].' '.i[1]
@@ -119,8 +120,10 @@ function! leaderf#Bookmark#NormalModeFilter(winid, key) abort
         exec g:Lf_py "bookmarkExplManager.do_command('delete')"
     elseif key ==# "E"
         exec g:Lf_py "bookmarkExplManager.do_command('edit')"
+    elseif key ==# "K"
+        exec g:Lf_py "bookmarkExplManager.do_command('add_dir')"
     elseif key ==# "N"
-        exec g:Lf_py "bookmarkExplManager.do_command('add')"
+        exec g:Lf_py "bookmarkExplManager.do_command('add_file')"
     else
         if key ==# '^\w+$'
             " No error is shown
