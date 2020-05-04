@@ -18,7 +18,7 @@ from leaderf.utils import *
 # *****************************************************
 class BookmarkExplorer(Explorer):
     def __init__(self):
-        pass
+        self._prefix_length = 0
 
     def getContent(self, *args, **kwargs):
         return self.getFreshContent()
@@ -36,6 +36,9 @@ class BookmarkExplorer(Explorer):
 
         if len(bookmarks) == 0:
             return [NO_CONTENT_MSG]
+
+        if lfEval("get(g:, 'Lf_ShowDevIcons', 1)") == '1':
+            self._prefix_length = webDevIconsStrLen()
 
         # from mruExpl.py
         _max_name_len = max(
@@ -70,6 +73,9 @@ class BookmarkExplorer(Explorer):
 
     def supportsNameOnly(self):
         return True
+
+    def getPrefixLength(self):
+        return self._prefix_length
 
 
 # *****************************************************
@@ -139,13 +145,22 @@ class BookmarkExplManager(Manager):
             return self.do_command(cmd_name)
 
     def _getDigest(self, line, mode):
+        """
+        specify what part in the line to be processed and highlighted
+        Args:
+            mode: 0, return the full path
+                  1, return the name only
+                  2, return the directory name
+        """
         if not line:
             return ""
+
+        prefix_len = self._getExplorer().getPrefixLength()
         if mode == 0:
-            return line
+            return line[prefix_len:]
         elif mode == 1:
             start_pos = line.find(" | ")
-            return line[:start_pos].rstrip()
+            return line[prefix_len:start_pos].rstrip()
         else:
             start_pos = line.find(" | ")
             return line[start_pos + 3 :]
@@ -158,7 +173,7 @@ class BookmarkExplManager(Manager):
             start_pos = line.find(" | ")
             return lfBytesLen(line[: start_pos + 3])
         else:
-            return 0
+            return self._getExplorer().getPrefixLength() - webDevIconsStrLen() + webDevIconsBytesLen()
 
     def _afterEnter(self):
         super(BookmarkExplManager, self)._afterEnter()
