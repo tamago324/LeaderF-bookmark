@@ -7,6 +7,7 @@ import os.path
 
 from bookmark.cmd import Cmd
 from bookmark.utils import NO_CONTENT_MSG, echo_error
+from leaderf.devicons import *
 from leaderf.explorer import *
 from leaderf.manager import *
 from leaderf.utils import *
@@ -41,12 +42,22 @@ class BookmarkExplorer(Explorer):
             int(lfEval("strdisplaywidth('{}')".format(escQuote(getBasename(line)))))
             for line in bookmarks.values()
         )
+        if lfEval("get(g:, 'Lf_ShowDevIcons', 1)") == "1":
+            _max_name_len += webDevIconsStrLen()
+
         lines = []
         for name, path in bookmarks.items():
             space_num = _max_name_len - int(
                 lfEval("strdisplaywidth('{}')".format(escQuote(name)))
             )
-            lines.append("{}{} | {}".format(name, " " * space_num, path))
+            lines.append(
+                "{}{}{} | {}".format(
+                    webDevIconsGetFileTypeSymbol(path, os.path.isdir(path)),
+                    name,
+                    " " * space_num,
+                    path,
+                )
+            )
 
         self._content = lines
         return lines
@@ -79,9 +90,37 @@ class BookmarkExplManager(Manager):
         if len(args) == 0:
             return
         line = args[0]
-        cmd = lfEval("g:Lf_BookmarkAcceptSelectionCmd")
         path = self._getDigest(line, 2)
-        lfCmd("{} {}".format(cmd, path))
+
+        if os.path.isdir(path):
+            if lfEval("has_key(g:, 'Lf_BookmarkAcceptSelectionCmd')") == "1":
+                # This will be removed in the future.
+                cmd = lfEval("get(g:, 'Lf_BookmarkAcceptSelectionCmd', 'edit')")
+            else:
+                cmd = lfEval("get(g:, 'Lf_BookmarkDirAcceptSelectionCmd', 'edit')")
+            lfCmd("%s %s" % (cmd, escSpecial(path)))
+            return
+
+        # file
+        try:
+            if kwargs.get("mode", "") != "t" or (
+                lfEval("get(g:, 'Lf_DiscardEmptyBuffer', 0)") == "1"
+                and len(vim.tabpages) == 1
+                and len(vim.current.tabpage.windows) == 1
+                and vim.current.buffer.name == ""
+                and len(vim.current.buffer) == 1
+                and vim.current.buffer[0] == ""
+                and not vim.current.buffer.options["modified"]
+            ):
+
+                if vim.current.buffer.options["modified"]:
+                    lfCmd("hide edit %s" % escSpecial(path))
+                else:
+                    lfCmd("edit %s" % escSpecial(path))
+            else:
+                lfCmd("tab drop %s" % escSpecial(path))
+        except vim.error as e:  # E37
+            lfPrintError(e)
 
     def do_command(self, cmd_name, silent=False):
         if self._command.contains(cmd_name):
@@ -123,22 +162,61 @@ class BookmarkExplManager(Manager):
 
     def _afterEnter(self):
         super(BookmarkExplManager, self)._afterEnter()
+        winid = None
+
         if self._getInstance().getWinPos() == "popup":
             lfCmd(
-                """call win_execute(%d, 'let matchid = matchadd(''Lf_hl_bookmarkPath'', ''\s+\zs\| .\+'')')"""
+                r"""call win_execute(%d, 'let matchid = matchadd(''Lf_hl_bookmarkPath'', ''| [^|]\+$'')')"""
                 % self._getInstance().getPopupWinId()
             )
             id = int(lfEval("matchid"))
             self._match_ids.append(id)
+
+            if lfEval("get(g:, 'Lf_ShowDevIcons', 1)") == "1":
+                lfCmd(
+                    """call win_execute(%d, 'let matchid = matchadd(''Lf_hl_bookmarkDirIcon'', ''^%s'')')"""
+                    % (
+                        self._getInstance().getPopupWinId(),
+                        webDevIconsGetFileTypeSymbol("", isdir=True),
+                    )
+                )
+                id = int(lfEval("matchid"))
+                self._match_ids.append(id)
+
+            winid = self._getInstance().getPopupWinId()
         else:
-            id = int(lfEval("matchadd('Lf_hl_bookmarkPath', '\s+\zs\| .\+')"))
+            id = int(lfEval(r"matchadd('Lf_hl_bookmarkPath', '| [^|]\+$')"))
             self._match_ids.append(id)
+
+            if lfEval("get(g:, 'Lf_ShowDevIcons', 1)") == "1":
+                id = int(
+                    lfEval(
+                        "matchadd('Lf_hl_bookmarkDirIcon', '^%s')"
+                        % webDevIconsGetFileTypeSymbol("", isdir=True)
+                    )
+                )
+                self._match_ids.append(id)
+
+        # devicons
+        if lfEval("get(g:, 'Lf_ShowDevIcons', 1)") == "1":
+            self._match_ids.extend(
+                matchaddDevIconsExtension(
+                    r"__icon__\ze\s\+.\{-}\.__name__\($\|\s\)", winid
+                )
+            )
+            self._match_ids.extend(
+                matchaddDevIconsExact(r"__icon__\ze\s\+__name__\($\|\s\)", winid)
+            )
+            self._match_ids.extend(
+                matchaddDevIconsDefault(r"__icon__\ze\s\+\S\+\($\|\s\)", winid)
+            )
 
     def _createHelp(self):
         help = []
         help.append('" <CR>/<double-click>/o : execute command under cursor')
         help.append('" i : switch to input mode')
-        help.append('" N : add bookmark')
+        help.append('" N : add file bookmark')
+        help.append('" K : add dir bookmark')
         help.append('" D : delete bookmark under cursor')
         help.append('" E : edit bookmark under cursor')
         help.append('" q : quit')

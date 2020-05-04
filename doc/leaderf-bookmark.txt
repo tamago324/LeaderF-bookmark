@@ -17,8 +17,8 @@ g:Lf_BookmarkFilePath                                   *g:Lf_BookmarkFilePath*
     Specify the path of the file to save the bookmark.
     default: '~/.LfBookmark'
 
-g:Lf_BookmarkAcceptSelectionCmd                      *g:Lf_BookmarkOpenCommand*
-    Command to execute when accepting selection.
+g:Lf_BookmarkDirAcceptSelectionCmd         *g:Lf_BookmarkDirAcceptSelectionCmd*
+    Command to execute when accepting directory selection.
     default: 'edit'
 
 ==============================================================================
@@ -38,7 +38,8 @@ Normal mode mappings
 
  lhs   command
 ----- ---------
-N     add bookmark
+N     add file bookmark
+K     add dir bookmark
 E     edit bookmark
 D     delete bookmark
 
@@ -53,6 +54,13 @@ Lf_hl_bookmarkPath                                         *Lf_hl_bookmarkPath*
 ==============================================================================
 CHANGELOG                                          *LeaderF-bookmark-changelog*
 
+
+0.0.5   2020-05-04
+    - Add `add_file` command
+    - Change |g:Lf_BookmarkDirAcceptSelectionCmd| option
+    - Change mappings
+        - N : `add_file`
+        - K : `add_dir`
 
 0.0.4   2020-04-30
     - Remove commands.

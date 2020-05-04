@@ -14,8 +14,9 @@ or
 
 ### Mappings
 
-| key | command         |
-|-----|-----------------|
-| N   | add bookmark    |
-| E   | edit bookmark   |
-| D   | delete bookmark |
+| key | command           |
+|-----|-------------------|
+| N   | add file bookmark |
+| K   | add dir bookmark  |
+| E   | edit bookmark     |
+| D   | delete bookmark   |
