@@ -15,7 +15,7 @@ OPTIONS~
 
 g:Lf_BookmarkFilePath                                   *g:Lf_BookmarkFilePath*
     Specify the path of the file to save the bookmark.
-    default: '~/.LfBookmark'
+    default: '~/.LfBookmarks'
 
 g:Lf_BookmarkDirAcceptSelectionCmd         *g:Lf_BookmarkDirAcceptSelectionCmd*
     Command to execute when accepting directory selection.

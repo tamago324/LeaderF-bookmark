@@ -24,15 +24,15 @@ class BookmarkExplorer(Explorer):
         return self.getFreshContent()
 
     def getFreshContent(self, *args, **kwargs):
-        bookmark_filepath = lfEval("g:Lf_BookmarkFilePath")
+        bookmark_filepath = lfEval("expand(get(g:, 'Lf_BookmarkFilePath', '~/.LfBookmarks'))")
         if not os.path.exists(bookmark_filepath):
-            return []
+            return [NO_CONTENT_MSG]
 
         try:
             with lfOpen(bookmark_filepath) as f:
                 bookmarks = json.load(f)
         except json.decoder.JSONDecodeError:
-            return []
+            return [NO_CONTENT_MSG]
 
         if len(bookmarks) == 0:
             return [NO_CONTENT_MSG]
